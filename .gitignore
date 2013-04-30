@@ -1,0 +1,4 @@
+.build/
+App-count-*.tar.gz
+App-count-*/
+*.BAK
