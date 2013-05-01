@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# PODNAME: count
+# ABSTRACT: Counting utility for a file consisting of the fixed number of fields like CSV
+# VERSION
+
+use App::count;
+
+App::count->run(@ARGV);
+
+__END__
+
+=head1 SYNOPSIS
+
+count C<-h>
+
+count [C<-g>|C<--group> E<lt>groupE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>sumE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
+
+  # show POD
+  count -h
+
+  # count the number of records grouping by the column 1 and 2
+  # The column number is 1-origin
+  count -g 1,2 file
+
+  # count the sum of the column 3 grouping by the column 1 and 2
+  # field delimiter is ','
+  count -g 1,2 -s 3 -t ',' file
+
+=head1 DESCRIPTION
+
+I has written a oneliner like the following repeatedly and repeatedly, to make some statistics.
+
+  perl -e 'while(<>) { @t = split /\t/; ++$c{$t[0]}; } foreach my $k (keys %c) { print "$k,$c{$k}\n"'
+
+Yes, we can write as the following making use of command line option.
+
+  perl -an -F "\t" -e '++$c{$F[0]} END { foreach my $k (keys %c) { print "$k,$c{$k}\n" }'
+
+This is still verbose in contrast with doing. By this script, you can write as the following. Please NOTE that the number is 1-origin.
+
+  count -g 1 -t "\t"
+
+Conforming to Unix philosophy, this scirpt does NOT have sort functionality. If you want it, you can use C<sort> command.
+
+  count -g 1 -t "\t" | sort -k n1
+
+=option C<-g>|C<--group> E<lt>groupE<gt>
+
+Specify group columns like GROUP BY in SQL, by comma separated numbers.
+
+=option C<-c>|C<--count>
+
+Output the number of records. If no other output option is specified, 
+
+=option C<-s>|C<--sum> E<lt>sumE<gt>
+
+Output the sum of the specified column.
+
+=option C<-m>|C<--map> E<lt>mapE<gt>
+
+Output mapped value of the specified column by the specified mapping key.
+Argument is a list of key and column like.
+
+  -m 0,class,1,subclass
+
+=option C<-M>|C<--map-file> E<lt>filenameE<gt>
+
+Specify map file used by -m option. The map file is YAML file having the following structure.
+
+  <key1>:
+    <number11>: <value11>
+    <number12>: <value12>
+  <key2>:
+    <number21>: <value21>
+    <number22>: <value22>
+
+=option C<-t>|C<--delimiter> E<lt>delimiterE<gt>
+
+Specify field separator character. The character is used by both of input and output.
+
+=option C<files>...
+
+Input files. If no files are specified, read from STDIN.
