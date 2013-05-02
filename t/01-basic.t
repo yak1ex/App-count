@@ -184,6 +184,42 @@ EOF
 EOF
 		'max, min, avg'
 	],
+	[
+		[qw(-g 1,2 -m 1,field1 -m 2,field2 -c -M t/map.yaml)], <<EOF,
+1	2	3
+1	2	4
+1	1	1
+2	3	1
+3	1	2
+1	1	2
+2	3	2
+EOF
+		<<EOF,
+1	1	one	ONE	2
+1	2	one	TWO	2
+2	3	two	THREE	2
+3	1	three	ONE	1
+EOF
+		'-g,mm'
+	],
+	[
+		[qw(-g 1,2 -m 1,field1,2,field2 -c -M t/map.yaml)], <<EOF,
+1	2	3
+1	2	4
+1	1	1
+2	3	1
+3	1	2
+1	1	2
+2	3	2
+EOF
+		<<EOF,
+1	1	one	ONE	2
+1	2	one	TWO	2
+2	3	two	THREE	2
+3	1	three	ONE	1
+EOF
+		'-g,mm'
+	],
 );
 
 plan tests => scalar @tests;

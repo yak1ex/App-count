@@ -8,6 +8,9 @@ use warnings;
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Pod::Usage;
+use YAML::Any;
+
+Getopt::Long::Configure('posix_default', 'no_ignore_case');
 
 sub run
 {
@@ -17,12 +20,20 @@ sub run
 	my %opts = (
 		c => sub { push @spec, ['count']; },
 		sum => $handler, max => $handler, min => $handler, avg => $handler,
+		'map' => sub {
+			my @t = split /,/, $_[1];
+			while(my ($idx, $key) = splice(@t, 0, 2)) {
+				push @spec, ['map', $idx-1, $key];
+			}
+		}
 	);
 	GetOptionsFromArray(\@_, \%opts,
-		'g|group=s@', 'c|count', 'sum|s=s@', 'm|map=s@', 'M|map-file=s', 't|delimiter=s',
+		'g|group=s@', 'c|count', 'sum|s=s@', 'map|m=s@', 'M|map-file=s', 't|delimiter=s',
 		'max=s@', 'min=s@', 'avg|ave=s@',
 	);
 
+	my $map;
+	$map = YAML::Any::LoadFile($opts{M}) or die "Can't load map file" if exists $opts{M};
 	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
 	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
@@ -34,6 +45,7 @@ sub run
 		avg => sub { [0,0] }, # Return new array reference
 		sum => sub { 0 },
 		count => sub { 0 },
+		'map' => sub { undef },
 	);
 
 	push @_, '-' if ! @_;
@@ -52,6 +64,7 @@ sub run
 			avg   => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx][0]; $data{$key}[$idx][1] += $F->[$spec[$idx][1]]; },
 			sum   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] += $F->[$spec[$idx][1]]; },
 			count => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx]; },
+			'map' => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] ||= $map->{$spec[$idx][2]}{$F->[$spec[$idx][1]]}; },
 		);
 		while(<$fh>) {
 			s/[\r\n]+$//;
