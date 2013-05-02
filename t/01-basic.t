@@ -170,6 +170,20 @@ EOF
 EOF
 		'-gssc'
 	],
+	[
+		[qw(-g 1 -s 2 --max 3 --min 3 --avg 3)], <<EOF,
+1	2	3
+1	1	1
+2	3	1
+3	1	2
+EOF
+		<<EOF,
+1	3	3	1	2
+2	3	1	1	1
+3	1	2	2	2
+EOF
+		'max, min, avg'
+	],
 );
 
 plan tests => scalar @tests;

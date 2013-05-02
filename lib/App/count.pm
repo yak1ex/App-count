@@ -13,18 +13,28 @@ sub run
 {
 	shift if @_ && eval { $_[0]->isa(__PACKAGE__) };
 	my @spec;
+	my $handler = sub { my $key = $_[0]; push @spec, map { [$key, $_-1 ] } split /,/, $_[1]; };
 	my %opts = (
 		c => sub { push @spec, ['count']; },
-		s => sub { push @spec, map { ['sum', $_-1 ] } split /,/, $_[1]; },
+		sum => $handler, max => $handler, min => $handler, avg => $handler,
 	);
 	GetOptionsFromArray(\@_, \%opts,
-		'g|group=s@', 'c|count', 's|sum=s@', 'm|map=s@', 'M|map-file=s', 't|delimiter=s'
+		'g|group=s@', 'c|count', 'sum|s=s@', 'm|map=s@', 'M|map-file=s', 't|delimiter=s',
+		'max=s@', 'min=s@', 'avg|ave=s@',
 	);
 
 	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
 	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
 	$opts{t} ||= '\s+';
+
+	my %init = (
+		max => sub { undef },
+		min => sub { undef },
+		avg => sub { [0,0] }, # Return new array reference
+		sum => sub { 0 },
+		count => sub { 0 },
+	);
 
 	push @_, '-' if ! @_;
 	while(my $file = shift @_) {
@@ -36,6 +46,13 @@ sub run
 		}
 
 		my %data;
+		my %proc = ( # $key, $idx, \@F
+			max   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] < $F->[$spec[$idx][1]]; },
+			min   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] > $F->[$spec[$idx][1]]; },
+			avg   => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx][0]; $data{$key}[$idx][1] += $F->[$spec[$idx][1]]; },
+			sum   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] += $F->[$spec[$idx][1]]; },
+			count => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx]; },
+		);
 		while(<$fh>) {
 			s/[\r\n]+$//;
 			my @F = split /$opts{t}/;
@@ -43,12 +60,8 @@ sub run
 			my $key = defined $group ? join("\x00", @F[@$group]) : '_';
 
 			foreach my $idx (0..$#spec) {
-				$data{$key}[$idx] ||= 0;
-				if($spec[$idx][0] eq 'count') {
-					++$data{$key}[$idx];
-				} else {
-					$data{$key}[$idx] += $F[$spec[$idx][1]];
-				}
+				$data{$key}[$idx] ||= $init{$spec[$idx][0]}->();
+				$proc{$spec[$idx][0]}->($key, $idx, \@F);
 			}
 		}
 
@@ -59,7 +72,7 @@ sub run
 		foreach my $key (sort keys %data) {
 			my @F;
 			push @F, split /\x00/, $key if exists $opts{g};
-			push @F, @{$data{$key}};
+			push @F, map { ref $_ ? $_->[1]/$_->[0] : $_ } @{$data{$key}};
 			print join($odelimiter, @F), "\n";
 		}
 	}
