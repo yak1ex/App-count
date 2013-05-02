@@ -44,7 +44,8 @@ This is still verbose in contrast with doing. By this script, you can write as t
 
   count -g 1 -t "\t"
 
-Conforming to Unix philosophy, this scirpt does NOT have sort functionality. If you want it, you can use C<sort> command.
+Conforming to Unix philosophy, this scirpt does NOT have configurable sort functionality.
+If you want it, you can use C<sort> command.
 
   count -g 1 -t "\t" | sort -k n1
 

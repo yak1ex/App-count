@@ -51,7 +51,7 @@ sub run
 			close $fh;
 		}
 
-		foreach my $key (keys %data) {
+		foreach my $key (sort keys %data) {
 			my @F;
 			push @F, split /\x00/, $key if exists $opts{g};
 			push @F, $data{$key}{count} if exists $opts{c};
