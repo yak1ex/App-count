@@ -156,6 +156,20 @@ EOF
 EOF
 		'-ggt rev'
 	],
+	[
+		[qw(-g 1 -s 2 -s 3 -c)], <<EOF,
+1	2	3
+1	1	1
+2	3	1
+3	1	2
+EOF
+		<<EOF,
+1	3	4	2
+2	3	1	1
+3	1	2	1
+EOF
+		'-gssc'
+	],
 );
 
 plan tests => scalar @tests;

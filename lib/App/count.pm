@@ -12,14 +12,17 @@ use Pod::Usage;
 sub run
 {
 	shift if @_ && eval { $_[0]->isa(__PACKAGE__) };
-	my %opts;
+	my @spec;
+	my %opts = (
+		c => sub { push @spec, ['count']; },
+		s => sub { push @spec, map { ['sum', $_-1 ] } split /,/, $_[1]; },
+	);
 	GetOptionsFromArray(\@_, \%opts,
 		'g|group=s@', 'c|count', 's|sum=s@', 'm|map=s@', 'M|map-file=s', 't|delimiter=s'
 	);
 
 	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
-	my $sum = exists $opts{s} ? [map { $_ -1 } map { split /,/ } @{$opts{s}}] : undef;
-	$opts{c} = 1 if ! exists $opts{s};
+	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
 	$opts{t} ||= '\s+';
 
@@ -38,11 +41,13 @@ sub run
 			my @F = split /$opts{t}/;
 
 			my $key = defined $group ? join("\x00", @F[@$group]) : '_';
-			++$data{$key}{count} if $opts{c};
-			if(defined $sum) {
-				foreach my $idx (0..$#$sum) {
-					$data{$key}{sum}[$idx] ||= 0;
-					$data{$key}{sum}[$idx] += $F[$sum->[$idx]];
+
+			foreach my $idx (0..$#spec) {
+				$data{$key}[$idx] ||= 0;
+				if($spec[$idx][0] eq 'count') {
+					++$data{$key}[$idx];
+				} else {
+					$data{$key}[$idx] += $F[$spec[$idx][1]];
 				}
 			}
 		}
@@ -54,8 +59,7 @@ sub run
 		foreach my $key (sort keys %data) {
 			my @F;
 			push @F, split /\x00/, $key if exists $opts{g};
-			push @F, $data{$key}{count} if exists $opts{c};
-			push @F, @{$data{$key}{sum}} if exists $opts{s};
+			push @F, @{$data{$key}};
 			print join($odelimiter, @F), "\n";
 		}
 	}
