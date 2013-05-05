@@ -104,7 +104,7 @@ This is an implementation module of a counting utility for a file consisting of 
 
 =method C<run(@arg)>
 
-Process arguments. Typically, C<@ARGV> is passed. For argument details, see L<installdeps>.
+Process arguments. Typically, C<@ARGV> is passed. For argument details, see L<count>.
 
 =head1 SEE ALSO
 
