@@ -2,5 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+v0.0.2    2013-05-10 08:17:55 Asia/Tokyo
+    - Add missing help options.
+    - Fix RT#85163 (Thanks to report, Alexandr Ciornii).
+
 v0.0.1    2013-05-03 08:53:41 Asia/Tokyo
     - Initial release.

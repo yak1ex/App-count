@@ -4,7 +4,7 @@ App::count - Counting utility for a file consisting of the fixed number of field
 
 # VERSION
 
-version v0.0.1
+version v0.0.2
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ This is an implementation module of a counting utility for a file consisting of 
 
 ## `run(@arg)`
 
-Process arguments. Typically, `@ARGV` is passed. For argument details, see [installdeps](http://search.cpan.org/perldoc?installdeps).
+Process arguments. Typically, `@ARGV` is passed. For argument details, see [count](http://search.cpan.org/perldoc?count).
 
 # SEE ALSO
 
