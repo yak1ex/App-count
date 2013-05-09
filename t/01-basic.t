@@ -20,6 +20,9 @@ sub check
 	} else {
 		close FROM_CHILD;
 		close TO_CHILD;
+		# Need to close first, at least, on Win32
+		close STDIN;
+		close STDOUT;
 		open STDIN, "<&FROM_PARENT";
 		open STDOUT, ">&TO_PARENT";
 		App::count->run(@{$_[0]});
