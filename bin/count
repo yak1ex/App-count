@@ -42,7 +42,7 @@ count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<
 
 I has written a oneliner like the following repeatedly and repeatedly, to make some statistics.
 
-  perl -e 'while(<>) { @t = split /\t/; ++$c{$t[0]}; } foreach my $k (keys %c) { print "$k,$c{$k}\n"'
+  perl -e 'while(<>) { @t = split /\t/; ++$c{$t[0]}; } foreach my $k (keys %c) { print "$k,$c{$k}\n" }'
 
 Yes, we can write as the following making use of command line option.
 
