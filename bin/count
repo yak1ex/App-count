@@ -61,38 +61,54 @@ If you want it, you can use C<sort> command.
 
 Show brief instruction.
 
+=for getopt 'h'
+
 =option C<--help>
 
 Show this POD.
+
+=for getopt 'help'
 
 =option C<-g>|C<--group> E<lt>columnsE<gt>
 
 Specify group columns like GROUP BY in SQL.
 You can specify multiple times and/or as comma separated numbers.
 
+=for getopt 'g|group=s@'
+
 =option C<-c>|C<--count>
 
 Output the number of records. If no other output option is specified, process as if this option is specified.
+
+=for getopt 'c|count'
 
 =option C<-s>|C<--sum> E<lt>columnsE<gt>
 
 Output the sum of the specified column.
 You can specify multiple times and/or as comma separated numbers.
 
+=for getopt 'sum|s=s@'
+
 =option C<--min> E<lt>columnsE<gt>
 
 Output the minimum value of the specified column.
 You can specify multiple times and/or as comma separated numbers.
+
+=for getopt 'min=s@'
 
 =option C<--max> E<lt>columnsE<gt>
 
 Output the maximum value of the specified column.
 You can specify multiple times and/or as comma separated numbers.
 
+=for getopt 'max=s@'
+
 =option C<--avg>|C<--ave> E<lt>columnsE<gt>
 
 Output the average of the specified column.
 You can specify multiple times and/or as comma separated numbers.
+
+=for getopt 'avg|ave=s@'
 
 =option C<-m>|C<--map> E<lt>mapE<gt>
 
@@ -100,6 +116,8 @@ Output mapped value of the specified column by the specified mapping key.
 Argument is a list of key and column like.
 
   -m 0,class,1,subclass
+
+=for getopt 'map|m=s@'
 
 =option C<-M>|C<--map-file> E<lt>filenameE<gt>
 
@@ -112,9 +130,13 @@ Specify map file used by -m option. The map file is YAML file having the followi
     <number21>: <value21>
     <number22>: <value22>
 
+=for getopt 'M|map-file=s'
+
 =option C<-t>|C<--delimiter> E<lt>delimiterE<gt>
 
 Specify field separator character. The character is used by both of input and output.
+
+=for getopt 't|delimiter=s'
 
 =option C<files>...
 

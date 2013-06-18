@@ -1,5 +1,7 @@
 use Test::More;
 use App::count;
+use Getopt::Config::FromPod;
+Getopt::Config::FromPod->set_class_default(-file => 'bin/count');
 
 sub check
 {

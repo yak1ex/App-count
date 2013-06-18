@@ -7,6 +7,7 @@ use warnings;
 # VERSION
 
 use Getopt::Long qw(GetOptionsFromArray);
+use Getopt::Config::FromPod;
 use Pod::Usage;
 use YAML::Any;
 
@@ -27,11 +28,7 @@ sub run
 			}
 		}
 	);
-	GetOptionsFromArray(\@_, \%opts,
-		'g|group=s@', 'c|count', 'sum|s=s@', 'map|m=s@', 'M|map-file=s', 't|delimiter=s',
-		'max=s@', 'min=s@', 'avg|ave=s@',
-		'h', 'help',
-	) or pod2usage(-verbose => 0);
+	GetOptionsFromArray(\@_, \%opts, Getopt::Config::FromPod->array) or pod2usage(-verbose => 0);
 	pod2usage(-verbose => 0) if exists $opts{h};
 	pod2usage(-verbose => 2) if exists $opts{help};
 
