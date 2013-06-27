@@ -31,10 +31,13 @@ sub run
 	GetOptionsFromArray(\@_, \%opts, Getopt::Config::FromPod->array) or pod2usage(-verbose => 0);
 	pod2usage(-verbose => 0) if exists $opts{h};
 	pod2usage(-verbose => 2) if exists $opts{help};
+	die "Column number MUST be more than 0" if grep { $_->[1] < 0 } @spec;
 
 	my $map;
 	$map = YAML::Any::LoadFile($opts{M}) or die "Can't load map file" if exists $opts{M};
+	die "Map key is not found in map file" if defined $map && grep { ! exists $map->{$_} } map { $_->[2] } grep { $_->[0] eq 'map' } @spec;
 	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
+	die "Column number must be more than 0" if defined $group && grep { $_ < 0 } @$group; 
 	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
 	$opts{t} ||= '\s+';
@@ -52,7 +55,7 @@ sub run
 	while(my $file = shift @_) {
 		my $fh;
 		if($file ne '-') {
-			open $fh, '<', $file;
+			open $fh, '<', $file or die "Can't open $file";
 		} else {
 			$fh = \*STDIN;
 		}
