@@ -35,9 +35,10 @@ sub run
 
 	my $map;
 	$map = YAML::Any::LoadFile($opts{M}) or die "Can't load map file" if exists $opts{M};
+	die "map is specified but map file is not specified" if ! defined $map && grep { $_->[0] eq 'map' } @spec;
 	die "Map key is not found in map file" if defined $map && grep { ! exists $map->{$_} } map { $_->[2] } grep { $_->[0] eq 'map' } @spec;
 	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
-	die "Column number must be more than 0" if defined $group && grep { $_ < 0 } @$group; 
+	die "Column number MUST be more than 0" if defined $group && grep { $_ < 0 } @$group; 
 	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
 	$opts{t} ||= '\s+';
