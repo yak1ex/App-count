@@ -10,8 +10,12 @@ use Getopt::Long qw(GetOptionsFromArray);
 use Getopt::Config::FromPod;
 use Pod::Usage;
 use YAML::Any;
+use Encode;
 
 Getopt::Long::Configure('posix_default', 'no_ignore_case');
+
+my $yaml = YAML::Any->implementation;
+my $encoder = $yaml eq 'YAML::Syck' || $yaml eq 'YAML::Old' ? sub { shift; } : sub { Encode::encode('utf-8', shift); };
 
 sub run
 {
@@ -68,7 +72,7 @@ sub run
 			avg   => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx][0]; $data{$key}[$idx][1] += $F->[$spec[$idx][1]]; },
 			sum   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] += $F->[$spec[$idx][1]]; },
 			count => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx]; },
-			'map' => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] ||= $map->{$spec[$idx][2]}{$F->[$spec[$idx][1]]}; },
+			'map' => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] ||= $encoder->($map->{$spec[$idx][2]}{$F->[$spec[$idx][1]]}); },
 		);
 		while(<$fh>) {
 			s/[\r\n]+$//;
