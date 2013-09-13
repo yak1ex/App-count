@@ -41,7 +41,14 @@ sub run
 	$map = YAML::Any::LoadFile($opts{M}) or die "Can't load map file" if exists $opts{M};
 	die "map is specified but map file is not specified" if ! defined $map && grep { $_->[0] eq 'map' } @spec;
 	die "Map key is not found in map file" if defined $map && grep { ! exists $map->{$_} } map { $_->[2] } grep { $_->[0] eq 'map' } @spec;
-	my $group = exists $opts{g} ? [map { $_ -1 } map { split /,/ } @{$opts{g}}] : undef;
+	my $group;
+	if(exists $opts{g}) {
+		if(@{$opts{g}} == 1 && $opts{g}[0] eq '*') {
+			$group = [];
+		} else {
+			$group = [map { $_ -1 } map { split /,/ } @{$opts{g}}];
+		}
+	}
 	die "Column number MUST be more than 0" if defined $group && grep { $_ < 0 } @$group; 
 	push @spec, ['count'] if ! @spec;
 	my $odelimiter = $opts{t} || "\t";
@@ -78,7 +85,7 @@ sub run
 			s/[\r\n]+$//;
 			my @F = split /$opts{t}/;
 
-			my $key = defined $group ? join("\x00", @F[@$group]) : '_';
+			my $key = defined $group ? join("\x00", @$group == 0 ? @F : @F[@$group]) : '_';
 
 			foreach my $idx (0..$#spec) {
 				$data{$key}[$idx] ||= $init{$spec[$idx][0]}->();

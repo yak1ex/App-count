@@ -38,6 +38,9 @@ count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<
   # Ouput min,max,average of the column 2 and the column 3 grouping by the column 1
   count -g 1 --min 2 --max 2 --avg 2 --min 3 --max 3 --avg 3
 
+  # All columns are kept and lookuped value of column 1 from foomap in map.yaml is appended
+  count -g '*' -M map.yaml -m 1,foomap
+
 =head1 DESCRIPTION
 
 I has written a oneliner like the following repeatedly and repeatedly, to make some statistics.
@@ -73,6 +76,9 @@ Show this POD.
 
 Specify group columns like GROUP BY in SQL.
 You can specify multiple times and/or as comma separated numbers.
+
+Specifying a char '*' only means all fields are used as a group.
+If there are 3 fields in a row, C<-g *> means C<-g 1,2,3>.
 
 =for getopt 'g|group=s@'
 
