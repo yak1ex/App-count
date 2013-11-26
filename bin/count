@@ -140,7 +140,9 @@ Specify map file used by -m option. The map file is YAML file having the followi
 
 =option C<-t>|C<--delimiter> E<lt>delimiterE<gt>
 
-Specify field separator character. The character is used by both of input and output.
+Specify field separator character. The character is used by both of input and output. Perl's escape such as '\x0D' is available. So, you need to care about escape. For example, if you want to use a backslash as a delimiter, you need to specify as '\\'.
+
+If omitted, the special rule is applied: /\s+/ is used for an input separator and '\t' is used for an output separator.
 
 =for getopt 't|delimiter=s'
 

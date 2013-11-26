@@ -11,6 +11,7 @@ use Getopt::Config::FromPod;
 use Pod::Usage;
 use YAML::Any;
 use Encode;
+use String::Unescape;
 
 Getopt::Long::Configure('posix_default', 'no_ignore_case');
 
@@ -51,8 +52,8 @@ sub run
 	}
 	die "Column number MUST be more than 0" if defined $group && grep { $_ < 0 } @$group; 
 	push @spec, ['count'] if ! @spec;
-	my $odelimiter = $opts{t} || "\t";
-	$opts{t} ||= '\s+';
+	my $odelimiter = defined($opts{t}) ? String::Unescape->unescape($opts{t}) : "\t";
+	$opts{t} = defined($opts{t}) ? String::Unescape->unescape($opts{t}) : '\s+';
 
 	my %init = (
 		max => sub { undef },

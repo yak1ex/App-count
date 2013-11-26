@@ -18,11 +18,11 @@ This is an implementation module of a counting utility for a file consisting of 
 
 ## `run(@arg)`
 
-Process arguments. Typically, `@ARGV` is passed. For argument details, see [count](http://search.cpan.org/perldoc?count).
+Process arguments. Typically, `@ARGV` is passed. For argument details, see [count](https://metacpan.org/pod/count).
 
 # SEE ALSO
 
-- [count](http://search.cpan.org/perldoc?count)
+- [count](https://metacpan.org/pod/count)
 
 # AUTHOR
 
