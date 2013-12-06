@@ -22,13 +22,15 @@ sub run
 {
 	shift if @_ && eval { $_[0]->isa(__PACKAGE__) };
 	my @spec;
-	my $handler = sub { my $key = $_[0]; push @spec, map { [$key, $_-1 ] } split /,/, $_[1]; };
+	my $max_col = 0;
+	my $handler = sub { my $key = $_[0]; push @spec, map { $max_col = $_ if $max_col < $_; [$key, $_-1 ] } split /,/, $_[1]; };
 	my %opts = (
 		c => sub { push @spec, ['count']; },
 		sum => $handler, max => $handler, min => $handler, avg => $handler,
 		'map' => sub {
 			my @t = split /,/, $_[1];
 			while(my ($idx, $key) = splice(@t, 0, 2)) {
+				$max_col = $idx if $max_col < $idx;
 				push @spec, ['map', $idx-1, $key];
 			}
 		}
@@ -47,7 +49,7 @@ sub run
 		if(@{$opts{g}} == 1 && $opts{g}[0] eq '*') {
 			$group = [];
 		} else {
-			$group = [map { $_ -1 } map { split /,/ } @{$opts{g}}];
+			$group = [map { $max_col = $_ if $max_col < $_; $_-1 } map { split /,/ } @{$opts{g}}];
 		}
 	}
 	die "Column number MUST be more than 0" if defined $group && grep { $_ < 0 } @$group; 
@@ -85,7 +87,10 @@ sub run
 		while(<$fh>) {
 			s/[\r\n]+$//;
 			my @F = split /$opts{t}/;
-
+			if(@F < $max_col) {
+				warn 'Wrong delimiter?: '.scalar(@F).' field(s) is/are fewer than '.$max_col.' specified in the option';
+				$max_col = 0; # Avoid repeated warnings
+			}
 			my $key = defined $group ? join("\x00", @$group == 0 ? @F : @F[@$group]) : '_';
 
 			foreach my $idx (0..$#spec) {
