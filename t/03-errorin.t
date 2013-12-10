@@ -46,7 +46,7 @@ my @tests = (
 EOF
 		qr{Wrong delimiter\?: 1 field\(s\) is/are fewer than 2 specified in the option},
 		'too few fields '.$_
-	] } qw(-g -group --sum -s --min --max --ave)),
+	] } qw(-g -group --sum -s --min --max --ave -r --reorder)),
 	map { [
 		['-M','t/map.yaml',$_,'2,field2'], <<EOF,
 1,2,3

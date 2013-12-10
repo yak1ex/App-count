@@ -18,6 +18,25 @@ Getopt::Long::Configure('posix_default', 'no_ignore_case');
 my $yaml = YAML::Any->implementation;
 my $encoder = $yaml eq 'YAML::Syck' || $yaml eq 'YAML::Old' ? sub { shift; } : sub { Encode::encode('utf-8', shift); };
 
+my $reorder = sub {
+	my ($spec, @F) = @_;
+	return @F unless length($spec);
+	my (@ret, %used);
+	foreach my $idx (0..$#F) {
+		my $index;
+		if($idx < @$spec && $spec->[$idx] ne '') {
+			$index = ($spec->[$idx] > 0) ? ($spec->[$idx] - 1) : ($spec->[$idx] + @F);
+		} else {
+			my $index_ = 0;
+			while(exists $used{$index_}) { ++$index_; }
+			$index = $index_;
+		}
+		push @ret, $F[$index];
+		$used{$index} = 1;
+	}
+	return @ret;
+};
+
 sub run
 {
 	shift if @_ && eval { $_[0]->isa(__PACKAGE__) };
@@ -54,6 +73,13 @@ sub run
 	}
 	die "Column number MUST be more than 0" if defined $group && grep { $_ < 0 } @$group; 
 	push @spec, ['count'] if ! @spec;
+	if(exists $opts{r}) {
+		$opts{r} = [ split /,/, $opts{r} ];
+		foreach my $idx (@{$opts{r}}) {
+			$max_col = $idx if $max_col < $idx;
+		}
+	}
+	die 'Column number MUST NOT be 0' if exists $opts{r} && grep { length != 0 && $_ == 0 } @{$opts{r}};
 	my $odelimiter = defined($opts{t}) ? String::Unescape->unescape($opts{t}) : "\t";
 	$opts{t} = defined($opts{t}) ? String::Unescape->unescape($opts{t}) : '\s+';
 
@@ -107,7 +133,7 @@ sub run
 			my @F;
 			push @F, split /\x00/, $key if exists $opts{g};
 			push @F, map { ref $_ ? $_->[1]/$_->[0] : $_ } @{$data{$key}};
-			print join($odelimiter, @F), "\n";
+			print join($odelimiter, $reorder->($opts{r}, @F)), "\n";
 		}
 	}
 }

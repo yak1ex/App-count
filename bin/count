@@ -19,7 +19,7 @@ count C<-h>
 
 count C<--help>
 
-count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>columnsE<gt>] [C<--min> E<lt>columnsE<gt>] [C<--max> E<lt>columnsE<gt>] [C<--avg>|C<--ave> E<lt>columnsE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
+count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>columnsE<gt>] [C<--min> E<lt>columnsE<gt>] [C<--max> E<lt>columnsE<gt>] [C<--avg>|C<--ave> E<lt>columnsE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-r>|C<--reorder> E<lt>orderE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
 
   # show brief instruction
   count -h
@@ -38,8 +38,8 @@ count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<
   # Ouput min,max,average of the column 2 and the column 3 grouping by the column 1
   count -g 1 --min 2 --max 2 --avg 2 --min 3 --max 3 --avg 3
 
-  # All columns are kept and lookuped value of column 1 from foomap in map.yaml is appended
-  count -g '*' -M map.yaml -m 1,foomap
+  # All columns are kept and lookuped value of column 1 from foomap in map.yaml is appended, then moved to the first column
+  count -g '*' -M map.yaml -m 1,foomap -r -1
 
 =head1 DESCRIPTION
 
@@ -137,6 +137,18 @@ Specify map file used by -m option. The map file is YAML file having the followi
     <number22>: <value22>
 
 =for getopt 'M|map-file=s'
+
+=option C<-r>|C<--reorder> E<lt>reorderE<gt>
+
+Specify column reorder as a comma separated integer list.
+C<5,4,3,2,1> means order from the 5th column to the 1st ciolumn.
+Any omitted indices are filled with unsed indices so far. Negative numbers are treated as indices relatve to the last column.
+Trailing repeated commas can be omitted.
+Thus, C<,3,2> is treated as if C<1,3,2,4,5,...> is specified and specifying just C<-1> means 1-step right rotation that is the last column moves to the first column.
+
+This option is in effect at the last stage of the process wherever it is specified.
+
+=for getopt 'r|reorder=s'
 
 =option C<-t>|C<--delimiter> E<lt>delimiterE<gt>
 
