@@ -4,7 +4,7 @@ App::count - Counting utility for a file consisting of the fixed number of field
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
 
 # SYNOPSIS
 
