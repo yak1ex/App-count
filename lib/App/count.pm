@@ -131,6 +131,7 @@ sub run
 
 		foreach my $key (sort keys %data) {
 			my @F;
+			if(exists $opts{H}) { push @F, $file }
 			push @F, split /\x00/, $key if exists $opts{g};
 			push @F, map { ref $_ ? $_->[1]/$_->[0] : $_ } @{$data{$key}};
 			print join($odelimiter, $reorder->($opts{r}, @F)), "\n";

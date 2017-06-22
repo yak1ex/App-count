@@ -19,7 +19,7 @@ count C<-h>
 
 count C<--help>
 
-count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>columnsE<gt>] [C<--min> E<lt>columnsE<gt>] [C<--max> E<lt>columnsE<gt>] [C<--avg>|C<--ave> E<lt>columnsE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-r>|C<--reorder> E<lt>orderE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
+count [C<-H>|C<--with-filename>] [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>columnsE<gt>] [C<--min> E<lt>columnsE<gt>] [C<--max> E<lt>columnsE<gt>] [C<--avg>|C<--ave> E<lt>columnsE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-r>|C<--reorder> E<lt>orderE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
 
   # show brief instruction
   count -h
@@ -71,6 +71,12 @@ Show brief instruction.
 Show this POD.
 
 =for getopt 'help'
+
+=option C<-H>|C<--with-filename>
+
+Show filename
+
+=for getopt 'H|with-filename'
 
 =option C<-g>|C<--group> E<lt>columnsE<gt>
 
