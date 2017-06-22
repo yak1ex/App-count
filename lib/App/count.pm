@@ -110,6 +110,7 @@ sub run
 			count => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx]; },
 			'map' => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] ||= $encoder->($map->{$spec[$idx][2]}{$F->[$spec[$idx][1]]}); },
 		);
+		<$fh> if exists $opts{k};
 		while(<$fh>) {
 			s/[\r\n]+$//;
 			my @F = split /$opts{t}/;
