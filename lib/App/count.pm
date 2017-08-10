@@ -91,6 +91,12 @@ sub run
 		count => sub { 0 },
 		'map' => sub { undef },
 	);
+	my $ignore_code = exists($opts{'ignore-by-code'}) ? eval 'sub {'.$opts{'ignore-by-code'}.'}' : sub {};
+	my $is_valid = sub {
+		my ($idx, $F) = @_;
+		return (!exists $opts{ignore} || $opts{ignore} != $F->[$spec[$idx][1]]) &&
+			(!exists $opts{'ignore-by-code'} || !($ignore_code->($F->[$spec[$idx][1]], $spec[$idx][1]))); ## no critic (ProhibitStringyEval)
+	};
 
 	push @_, '-' if ! @_;
 	while(my $file = shift @_) {
@@ -103,11 +109,11 @@ sub run
 
 		my %data;
 		my %proc = ( # $key, $idx, \@F
-			max   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] < $F->[$spec[$idx][1]]; },
-			min   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] > $F->[$spec[$idx][1]]; },
-			avg   => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx][0]; $data{$key}[$idx][1] += $F->[$spec[$idx][1]]; },
-			sum   => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] += $F->[$spec[$idx][1]]; },
-			count => sub { my ($key, $idx, $F) = @_; ++$data{$key}[$idx]; },
+			max   => sub { my ($key, $idx, $F) = @_; if($is_valid->($idx, $F)) { $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] < $F->[$spec[$idx][1]]; } },
+			min   => sub { my ($key, $idx, $F) = @_; if($is_valid->($idx, $F)) { $data{$key}[$idx] = $F->[$spec[$idx][1]] if ! defined $data{$key}[$idx] || $data{$key}[$idx] > $F->[$spec[$idx][1]]; } },
+			avg   => sub { my ($key, $idx, $F) = @_; if($is_valid->($idx, $F)) { ++$data{$key}[$idx][0]; $data{$key}[$idx][1] += $F->[$spec[$idx][1]]; } },
+			sum   => sub { my ($key, $idx, $F) = @_; if($is_valid->($idx, $F)) { $data{$key}[$idx] += $F->[$spec[$idx][1]]; } },
+			count => sub { my ($key, $idx, $F) = @_; if($is_valid->($idx, $F)) { ++$data{$key}[$idx]; } },
 			'map' => sub { my ($key, $idx, $F) = @_; $data{$key}[$idx] ||= $encoder->($map->{$spec[$idx][2]}{$F->[$spec[$idx][1]]}); },
 		);
 		<$fh> if exists $opts{k};
@@ -134,7 +140,7 @@ sub run
 			my @F;
 			if(exists $opts{H}) { push @F, $file }
 			push @F, split /\x00/, $key if exists $opts{g};
-			push @F, map { ref $_ ? $_->[1]/$_->[0] : $_ } @{$data{$key}};
+			push @F, map { ref $_ ? ($_->[0] != 0 ? $_->[1]/$_->[0] : $_->[1]) : $_ } @{$data{$key}};
 			print join($odelimiter, $reorder->($opts{r}, @F)), "\n";
 		}
 	}

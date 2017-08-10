@@ -170,6 +170,18 @@ If omitted, the special rule is applied: /\s+/ is used for an input separator an
 
 =for getopt 't|delimiter=s'
 
+=option C<--ignore> E<lt>ignore_valueE<gt>
+
+Specify an ignore value for statistics (count, sum, min, max, avg).
+
+=for getopt 'ignore=s'
+
+=option C<--ignore-by-code> E<lt>ignore_criteriaE<gt>
+
+Specify an ignore critearia code for statistics (count, sum, min, max, avg). The criteria code is called as C<criteria($value, $index)>. If it returns true, the value is ignored for statistics.
+
+=for getopt 'ignore-by-code=s'
+
 =option C<files>...
 
 Input files. If no files are specified, read from STDIN.
